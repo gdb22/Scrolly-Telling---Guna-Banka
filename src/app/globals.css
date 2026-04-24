@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f0e8;
+  --foreground: #111111;
+  --surface: rgba(255, 255, 255, 0.8);
+  --line: rgba(17, 17, 17, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-space-grotesk);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  background-image:
+    linear-gradient(to right, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 40%);
+  background-size: 40px 40px, 40px 40px, auto;
+}
+
+body::selection {
+  background: #2864f0;
+  color: #ffffff;
+}
+
+a,
+button {
+  cursor: pointer;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #2864f0;
+  outline-offset: 3px;
+}
+
+img {
+  user-select: none;
+}
+
+.motion-card {
+  transform: translateY(0);
+}
+
+.motion-card:hover {
+  transform: translateY(-4px);
+}
+
+.animate-float-slow {
+  animation: float-slow 12s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-slow 14s ease-in-out infinite 1.6s;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .motion-card,
+  .motion-card:hover,
+  .animate-float-slow,
+  .animate-float-delayed {
+    animation: none;
+    transform: none;
+  }
 }
