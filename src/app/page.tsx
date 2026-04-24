@@ -1,837 +1,665 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type StorySection = {
-  id: string;
-  step: string;
-  title: string;
-  summary: string;
-  insight: string;
-  image: string;
-  alt: string;
-  accent: string;
-  accentSoft: string;
-  accentText: string;
-  statValue: string;
-  statLabel: string;
-  bullets: string[];
-};
-
-type PriorityLens = {
-  id: string;
-  label: string;
-  metric: string;
-  detail: string;
-  sectionId: string;
-};
-
-type ComparisonMetricId = "range" | "charge" | "cost" | "comfort";
-
-type ComparisonMetric = {
-  id: ComparisonMetricId;
-  label: string;
-  unit: string;
-  description: string;
-  accent: string;
-};
-
-type EVProfile = {
-  id: string;
-  name: string;
-  audience: string;
-  sectionId: string;
-  summary: string;
-  values: Record<ComparisonMetricId, number>;
-};
-
-const storySections: StorySection[] = [
-  {
-    id: "switch",
-    step: "01 / MARKET SHIFT",
-    title: "Electric vehicles moved from niche signal to mainstream system.",
-    summary:
-      "The conversation is no longer whether EVs belong on the road. It is how fast cities, grids, and drivers can adapt to them.",
-    insight:
-      "Mass-market adoption now depends on trust: visible charging, understandable range, and vehicles that feel desirable before they feel technical.",
-    image: "/images/EV cars.png",
-    alt: "A lineup of electric cars displayed outdoors.",
-    accent: "bg-[#e6483d]",
-    accentSoft: "bg-[#e6483d]/12",
-    accentText: "text-[#8c221a]",
-    statValue: "4x",
-    statLabel: "More EV choices on sale than just a few model cycles ago.",
-    bullets: [
-      "Automakers now compete on platform ecosystems, not only horsepower.",
-      "New buyers expect clear ownership savings and cleaner city mobility.",
-      "Visual design matters because EVs are consumer technology as much as transport.",
-    ],
-  },
-  {
-    id: "battery",
-    step: "02 / BATTERY INTELLIGENCE",
-    title: "The battery is the invisible architecture shaping confidence.",
-    summary:
-      "Battery technology determines range, charging behavior, thermal stability, and ultimately how relaxed a driver feels during a trip.",
-    insight:
-      "Good EV UX reduces cognitive load: drivers want predictable performance, smart routing, and transparent energy use—not more dashboard anxiety.",
-    image: "/images/EV car battery.png",
-    alt: "A close look at an EV battery system integrated into a vehicle chassis.",
-    accent: "bg-[#f5c518]",
-    accentSoft: "bg-[#f5c518]/14",
-    accentText: "text-[#6e5300]",
-    statValue: "15 min",
-    statLabel: "A useful fast-charge window that can reshape trip planning.",
-    bullets: [
-      "Energy density improves vehicle packaging and frees interior space.",
-      "Battery software is now part of the design language of the car.",
-      "Thermal management separates a smooth ownership experience from a frustrating one.",
-    ],
-  },
-  {
-    id: "charging",
-    step: "03 / CHARGING CULTURE",
-    title: "Charging is where infrastructure becomes experience design.",
-    summary:
-      "The most important EV interaction often happens outside the car: at home, curbside, at work, or in high-speed corridors between cities.",
-    insight:
-      "A great charging experience feels frictionless, visible, and confidently timed. The best networks behave like wayfinding systems, not technical hurdles.",
-    image: "/images/EV car charging.png",
-    alt: "An electric car plugged into a charging station.",
-    accent: "bg-[#2864f0]",
-    accentSoft: "bg-[#2864f0]/12",
-    accentText: "text-[#0d348c]",
-    statValue: "80%",
-    statLabel: "Charging milestones influence how people perceive convenience.",
-    bullets: [
-      "Home charging turns the vehicle into part of the daily routine.",
-      "Public charging quality depends on signage, availability, and payment clarity.",
-      "Route planning becomes storytelling when the interface explains the next stop.",
-    ],
-  },
-  {
-    id: "cabin",
-    step: "04 / CABIN FUTURE",
-    title: "EV interiors redefine calm, software, and spatial comfort.",
-    summary:
-      "Without the same packaging constraints as combustion platforms, cabins can become brighter, quieter, and more intentional in their ergonomics.",
-    insight:
-      "Interior quality is now measured in attention flow: fewer distractions, better materials, quieter travel, and controls that respect human focus.",
-    image: "/images/EV car interior.png",
-    alt: "The interior dashboard and seats of a modern electric vehicle.",
-    accent: "bg-[#111111]",
-    accentSoft: "bg-[#111111]/8",
-    accentText: "text-[#111111]",
-    statValue: "360°",
-    statLabel: "A holistic cabin experience spanning comfort, display logic, and acoustics.",
-    bullets: [
-      "Flat floors and open layouts change how riders perceive space.",
-      "Quiet drivetrains amplify the importance of materials and sound design.",
-      "The most premium EV cabins feel editorial rather than overloaded.",
-    ],
-  },
-];
-
-const priorityLenses: PriorityLens[] = [
-  {
-    id: "range",
-    label: "Range confidence",
-    metric: "Predictable distance",
-    detail:
-      "Drivers adopt EVs faster when route planning feels calm, transparent, and easy to trust.",
-    sectionId: "battery",
-  },
-  {
-    id: "charging",
-    label: "Charging ease",
-    metric: "Fast, visible access",
-    detail:
-      "Charging adoption improves when stations are easy to find, simple to use, and integrated into daily movement.",
-    sectionId: "charging",
-  },
-  {
-    id: "design",
-    label: "Cabin design",
-    metric: "Quiet spatial comfort",
-    detail:
-      "Interior calm and intuitive controls make electrification feel premium instead of purely technical.",
-    sectionId: "cabin",
-  },
-  {
-    id: "impact",
-    label: "Urban impact",
-    metric: "Cleaner daily mobility",
-    detail:
-      "The strongest value story pairs lower tailpipe emissions with quieter, more livable streets.",
-    sectionId: "switch",
-  },
-];
-
-const snapshotCards = [
-  {
-    value: "01",
-    label: "Narrative built as a guided editorial scroll.",
-  },
-  {
-    value: "04",
-    label: "Visual chapters anchored to real EV imagery.",
-  },
-  {
-    value: "UX",
-    label: "Interactive controls that let the reader choose their lens.",
-  },
-];
-
-const comparisonMetrics: ComparisonMetric[] = [
-  {
-    id: "range",
-    label: "Range",
-    unit: "mi",
-    description: "Approximate distance confidence for a single full charge.",
-    accent: "bg-[#2864f0]",
-  },
-  {
-    id: "charge",
-    label: "Fast charge",
-    unit: "min",
-    description: "Illustrative time to recover most of a useful trip window.",
-    accent: "bg-[#e6483d]",
-  },
-  {
-    id: "cost",
-    label: "Monthly energy",
-    unit: "$",
-    description: "Estimated monthly charging cost under a typical ownership pattern.",
-    accent: "bg-[#f5c518]",
-  },
-  {
-    id: "comfort",
-    label: "Cabin calm",
-    unit: "/10",
-    description: "A design-led score for quietness, spaciousness, and interface ease.",
-    accent: "bg-[#111111]",
-  },
-];
-
-const evProfiles: EVProfile[] = [
-  {
-    id: "commuter",
-    name: "Urban commuter",
-    audience: "Dense daily movement",
-    sectionId: "charging",
-    summary:
-      "Best when charging access is visible, short stops are predictable, and city travel stays quiet and low-friction.",
-    values: {
-      range: 260,
-      charge: 18,
-      cost: 54,
-      comfort: 7,
-    },
-  },
-  {
-    id: "touring",
-    name: "Weekend touring",
-    audience: "Long-distance flexibility",
-    sectionId: "battery",
-    summary:
-      "Ideal for drivers who want stronger range buffers and fewer planning interruptions between destinations.",
-    values: {
-      range: 360,
-      charge: 24,
-      cost: 68,
-      comfort: 8,
-    },
-  },
-  {
-    id: "premium",
-    name: "Premium family",
-    audience: "Comfort-first ownership",
-    sectionId: "cabin",
-    summary:
-      "Balances confident charging, refined cabin materials, and calm UX for longer shared trips.",
-    values: {
-      range: 320,
-      charge: 20,
-      cost: 63,
-      comfort: 9,
-    },
-  },
-];
+function clamp(val: number, min = 0, max = 1) {
+  return Math.max(min, Math.min(max, val));
+}
+function sub(p: number, a: number, b: number) {
+  return clamp((p - a) / (b - a));
+}
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * clamp(t);
+}
+function ease(t: number) {
+  const c = clamp(t);
+  return 1 - Math.pow(1 - c, 3);
+}
+function sectionProgress(el: HTMLElement | null): number {
+  if (!el) return 0;
+  const rect = el.getBoundingClientRect();
+  const h = el.offsetHeight - window.innerHeight;
+  if (h <= 0) return 0;
+  return clamp(-rect.top / h);
+}
+function fadeUp(opacity: number, yStart = 32): React.CSSProperties {
+  return {
+    opacity,
+    transform: `translateY(${lerp(yStart, 0, opacity)}px)`,
+    willChange: "opacity, transform",
+  };
+}
 
 export default function Home() {
-  const [activeSectionId, setActiveSectionId] = useState(storySections[0].id);
-  const [selectedLensId, setSelectedLensId] = useState(priorityLenses[0].id);
-  const [selectedMetricId, setSelectedMetricId] = useState<ComparisonMetricId>(
-    comparisonMetrics[0].id,
-  );
+  const heroRef     = useRef<HTMLElement>(null);
+  const compareRef  = useRef<HTMLElement>(null);
+  const emissRef    = useRef<HTMLElement>(null);
+  const perfRef     = useRef<HTMLElement>(null);
+  const costRef     = useRef<HTMLElement>(null);
+  const chargRef    = useRef<HTMLElement>(null);
+  const interiorRef = useRef<HTMLElement>(null);
+
+  const [heroP,   setHeroP]   = useState(0);
+  const [compP,   setCompP]   = useState(0);
+  const [emissP,  setEmissP]  = useState(0);
+  const [perfP,   setPerfP]   = useState(0);
+  const [costP,   setCostP]   = useState(0);
+  const [chargP,  setChargP]  = useState(0);
+  const [intP,    setIntP]    = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+  const [pageH,   setPageH]   = useState(1);
 
   useEffect(() => {
-    const sectionElements = document.querySelectorAll<HTMLElement>(
-      "[data-story-section]",
-    );
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (first, second) =>
-              second.intersectionRatio - first.intersectionRatio,
-          )[0];
-
-        if (visibleEntry?.target.id) {
-          setActiveSectionId(visibleEntry.target.id.replace("story-", ""));
-        }
-      },
-      {
-        rootMargin: "-20% 0px -35% 0px",
-        threshold: [0.2, 0.45, 0.7],
-      },
-    );
-
-    sectionElements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
+    const update = () => {
+      setScrollY(window.scrollY);
+      setPageH(Math.max(1, document.body.scrollHeight - window.innerHeight));
+      setHeroP(sectionProgress(heroRef.current));
+      setCompP(sectionProgress(compareRef.current));
+      setEmissP(sectionProgress(emissRef.current));
+      setPerfP(sectionProgress(perfRef.current));
+      setCostP(sectionProgress(costRef.current));
+      setChargP(sectionProgress(chargRef.current));
+      setIntP(sectionProgress(interiorRef.current));
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
-  const activeSectionIndex = storySections.findIndex(
-    (section) => section.id === activeSectionId,
-  );
+  const hTitleIn  = ease(sub(heroP, 0.00, 0.18));
+  const hSubIn    = ease(sub(heroP, 0.13, 0.28));
+  const hCtaIn    = ease(sub(heroP, 0.24, 0.36));
+  const hExitOut  = 1 - ease(sub(heroP, 0.62, 0.90));
+  const hImgScale = lerp(1.05, 1.14, heroP);
 
-  const activeSection =
-    storySections[activeSectionIndex] ?? storySections[0];
+  const cGasIn  = ease(sub(compP, 0.00, 0.22));
+  const cGasOut = 1 - ease(sub(compP, 0.38, 0.60));
+  const cEvIn   = ease(sub(compP, 0.55, 0.82));
 
-  const selectedLens =
-    priorityLenses.find((lens) => lens.id === selectedLensId) ??
-    priorityLenses[0];
+  const eIn        = ease(sub(emissP, 0.00, 0.18));
+  const eCounter   = lerp(156, 0, ease(sub(emissP, 0.08, 0.64)));
+  const eDetailsIn = ease(sub(emissP, 0.50, 0.76));
 
-  const selectedMetric =
-    comparisonMetrics.find((metric) => metric.id === selectedMetricId) ??
-    comparisonMetrics[0];
+  const pEnter     = ease(sub(perfP, 0.00, 0.18));
+  const pGasBar    = lerp(0, 100, ease(sub(perfP, 0.04, 0.45)));
+  const pEvBar     = lerp(0,  42, ease(sub(perfP, 0.26, 0.65)));
+  const pBadgeIn   = ease(sub(perfP, 0.42, 0.60));
+  const pDetailsIn = ease(sub(perfP, 0.62, 0.82));
 
-  const rankedProfiles = useMemo(() => {
-    const direction = selectedMetricId === "charge" || selectedMetricId === "cost" ? 1 : -1;
+  const coEnter  = ease(sub(costP, 0.00, 0.18));
+  const coGasH   = lerp(0, 280, ease(sub(costP, 0.04, 0.52)));
+  const coEvH    = lerp(0, 124, ease(sub(costP, 0.20, 0.62)));
+  const coTextIn = ease(sub(costP, 0.60, 0.82));
 
-    return [...evProfiles].sort((first, second) => {
-      return direction * (first.values[selectedMetricId] - second.values[selectedMetricId]);
-    });
-  }, [selectedMetricId]);
+  const chEnter  = ease(sub(chargP, 0.00, 0.20));
+  const chFill   = lerp(0, 78, ease(sub(chargP, 0.08, 0.60)));
+  const chTextIn = ease(sub(chargP, 0.50, 0.76));
 
-  const metricDomain = useMemo(() => {
-    const values = evProfiles.map((profile) => profile.values[selectedMetricId]);
-    return {
-      min: Math.min(...values),
-      max: Math.max(...values),
-    };
-  }, [selectedMetricId]);
-
-  const progressWidth = useMemo(() => {
-    return `${((activeSectionIndex + 1) / storySections.length) * 100}%`;
-  }, [activeSectionIndex]);
-
-  const scrollToSection = (sectionId: string) => {
-    document
-      .getElementById(`story-${sectionId}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  const iImgScale = lerp(1.12, 1.00, ease(sub(intP, 0.00, 0.65)));
+  const iTextIn   = ease(sub(intP, 0.14, 0.50));
+  const iBenefits = ease(sub(intP, 0.44, 0.72));
 
   return (
-    <main className="relative isolate overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="animate-float-slow absolute -left-12 top-24 h-48 w-48 rounded-full bg-[#e6483d]/18 blur-3xl" />
-        <div className="animate-float-delayed absolute right-[-4rem] top-[18rem] h-64 w-64 rounded-full bg-[#2864f0]/16 blur-3xl" />
-        <div className="animate-float-slow absolute bottom-20 left-1/3 h-56 w-56 rotate-12 bg-[#f5c518]/18 blur-3xl" />
-        <div className="absolute left-[10%] top-[14%] h-16 w-16 rounded-full border-8 border-[#111111]/70" />
-        <div className="absolute right-[14%] top-[8%] h-20 w-20 bg-[#2864f0]" />
-        <div className="absolute bottom-[18%] right-[8%] h-24 w-24 rounded-full bg-[#e6483d]" />
-      </div>
+    <>
+      <nav
+        className={`fixed left-0 right-0 top-0 z-50 transition-colors duration-700 ${
+          scrollY > 80 ? "bg-black/80 backdrop-blur-md" : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.38em] text-white/65">
+            Electric / Future
+          </p>
+          <a
+            href="#close"
+            className="rounded-full border border-white/18 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/65 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+          >
+            Make the switch
+          </a>
+        </div>
+        <div className="h-[1.5px] bg-white/8">
+          <div
+            className="h-full bg-white/55 transition-none"
+            style={{ width: `${(scrollY / pageH) * 100}%` }}
+          />
+        </div>
+      </nav>
 
-      <section className="border-b border-black/10 px-6 py-8 md:px-10 lg:px-12">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 text-xs font-medium uppercase tracking-[0.28em] text-black/55">
-          <p>Spec-driven scrollytelling / EV futures</p>
-          <p>Interactive editorial prototype</p>
+      {/* 1 — HERO */}
+      <section ref={heroRef} style={{ height: "300vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden bg-black">
+          <div
+            className="absolute inset-0"
+            style={{ transform: `scale(${hImgScale})`, willChange: "transform" }}
+          >
+            <Image
+              src="/images/EV cars.png"
+              alt="A lineup of electric vehicles"
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
+          </div>
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+            style={{ opacity: hExitOut, willChange: "opacity" }}
+          >
+            <p
+              style={fadeUp(hTitleIn, 20)}
+              className="text-[11px] font-semibold uppercase tracking-[0.48em] text-white/50"
+            >
+              The electric age
+            </p>
+            <h1
+              style={fadeUp(hTitleIn, 56)}
+              className="mt-5 max-w-5xl text-[clamp(46px,9.5vw,136px)] font-semibold uppercase leading-[0.85] tracking-[-0.055em] text-white"
+            >
+              The last gas car has already been built.
+            </h1>
+            <p
+              style={fadeUp(hSubIn, 28)}
+              className="mt-8 max-w-lg text-xl leading-9 text-white/65"
+            >
+              Electric vehicles are faster, cleaner, and dramatically cheaper to run. Scroll to see
+              why there is no going back.
+            </p>
+            <p
+              style={{ opacity: hCtaIn }}
+              className="mt-12 text-[11px] font-semibold uppercase tracking-[0.44em] text-white/30"
+            >
+              Scroll to explore
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="px-6 pb-14 pt-10 md:px-10 lg:px-12 lg:pb-20 lg:pt-14">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:items-start">
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-3 rounded-full border border-black/10 bg-white/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-black/55 shadow-[0_16px_60px_rgba(17,17,17,0.08)] backdrop-blur">
-              <span className="h-2 w-2 rounded-full bg-[#e6483d]" />
-              Bauhaus color + Swiss grid direction
-            </div>
-
-            <div className="space-y-6">
-              <h1 className="max-w-4xl text-5xl font-semibold uppercase leading-[0.92] tracking-[-0.05em] text-black sm:text-6xl lg:text-8xl">
-                Electric cars are
-                <span className="block text-[#2864f0]">redesigning motion</span>
-                <span className="block">from battery to boulevard.</span>
-              </h1>
-              <p className="max-w-2xl text-lg leading-8 text-black/72 md:text-xl">
-                This story uses scroll, image, typography, and reader-selected
-                priorities to explain why EV adoption now hinges on confidence,
-                charging clarity, and human-centered interior design.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              <button
-                type="button"
-                onClick={() => scrollToSection(storySections[0].id)}
-                className="rounded-full bg-black px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                Start the story
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollToSection(selectedLens.sectionId)}
-                className="rounded-full border border-black/15 bg-white/80 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black transition-colors duration-200 hover:bg-[#f5c518]"
-              >
-                Jump to {selectedLens.label}
-              </button>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              {snapshotCards.map((card) => (
+      {/* 2 — GAS VS EV */}
+      <section ref={compareRef} style={{ height: "340vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#0a0a0a]">
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center px-6"
+            style={{
+              opacity: cGasIn * cGasOut,
+              transform: `translateY(${lerp(28, 0, cGasIn)}px)`,
+              willChange: "opacity, transform",
+            }}
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.46em] text-white/30">
+              The old way
+            </p>
+            <h2 className="mt-4 text-[clamp(32px,6vw,82px)] font-semibold uppercase leading-none tracking-[-0.05em] text-white/25 line-through decoration-red-500 decoration-[5px]">
+              Internal combustion
+            </h2>
+            <div className="mt-10 grid w-full max-w-4xl grid-cols-2 gap-4 md:grid-cols-4">
+              {[
+                { label: "CO2 tailpipe", value: "156g",   note: "Per km. Every km."        },
+                { label: "Annual fuel",  value: "$3,200", note: "Volatile. Non-negotiable." },
+                { label: "Engine parts", value: "2,000+", note: "Every one can fail."       },
+                { label: "0-60 mph",     value: "7.4 s",  note: "Waiting for the shift."   },
+              ].map((s) => (
                 <div
-                  key={card.value}
-                  className="rounded-[1.75rem] border border-black/10 bg-white/80 p-5 shadow-[0_24px_80px_rgba(17,17,17,0.08)] backdrop-blur"
+                  key={s.label}
+                  className="rounded-[1.5rem] border border-white/6 bg-red-950/20 p-5 text-center"
                 >
-                  <p className="text-2xl font-semibold uppercase tracking-[-0.06em] text-black">
-                    {card.value}
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/28">
+                    {s.label}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-black/70">
-                    {card.label}
+                  <p className="mt-3 text-[clamp(22px,3.2vw,34px)] font-semibold tracking-[-0.04em] text-red-400">
+                    {s.value}
                   </p>
+                  <p className="mt-2 text-xs text-white/28">{s.note}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          <div className="rounded-[2rem] border border-black/10 bg-white/85 p-6 shadow-[0_32px_100px_rgba(17,17,17,0.08)] backdrop-blur">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-                  Reader lens
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold uppercase tracking-[-0.04em] text-black">
-                  What matters most to you?
-                </h2>
-              </div>
-              <div className="h-12 w-12 rounded-full bg-[#2864f0]" />
-            </div>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {priorityLenses.map((lens) => {
-                const isSelected = lens.id === selectedLensId;
-
-                return (
-                  <button
-                    key={lens.id}
-                    type="button"
-                    onClick={() => setSelectedLensId(lens.id)}
-                    className={`rounded-[1.4rem] border px-4 py-4 text-left transition-all duration-200 ${
-                      isSelected
-                        ? "border-black bg-black text-white shadow-[0_24px_70px_rgba(17,17,17,0.2)]"
-                        : "border-black/10 bg-[#f7f4ef] text-black hover:-translate-y-0.5 hover:border-black/30"
-                    }`}
-                  >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] opacity-60">
-                      {lens.label}
-                    </p>
-                    <p className="mt-3 text-lg font-semibold uppercase tracking-[-0.03em]">
-                      {lens.metric}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-6 rounded-[1.6rem] border border-black/10 bg-[#f7f4ef] p-5">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/45">
-                  Active insight
-                </p>
-                <button
-                  type="button"
-                  onClick={() => scrollToSection(selectedLens.sectionId)}
-                  className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2864f0]"
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center px-6"
+            style={{
+              opacity: cEvIn,
+              transform: `translateY(${lerp(48, 0, cEvIn)}px)`,
+              willChange: "opacity, transform",
+            }}
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.46em] text-white/40">
+              Now meet electric
+            </p>
+            <h2 className="mt-4 text-[clamp(32px,6vw,82px)] font-semibold uppercase leading-none tracking-[-0.05em] text-white">
+              Pure upgrade.
+            </h2>
+            <div className="mt-10 grid w-full max-w-4xl grid-cols-2 gap-4 md:grid-cols-4">
+              {[
+                { label: "CO2 tailpipe",  value: "0g",    note: "Zero. Exactly zero."   },
+                { label: "Annual energy", value: "$700",  note: "78% cheaper than gas." },
+                { label: "Moving parts",  value: "~20",   note: "Radically simpler."    },
+                { label: "0-60 mph",      value: "3.1 s", note: "Instant torque. Now."  },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-[1.5rem] border border-emerald-500/15 bg-emerald-950/30 p-5 text-center"
                 >
-                  Open chapter
-                </button>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/40">
+                    {s.label}
+                  </p>
+                  <p className="mt-3 text-[clamp(22px,3.2vw,34px)] font-semibold tracking-[-0.04em] text-emerald-400">
+                    {s.value}
+                  </p>
+                  <p className="mt-2 text-xs text-white/42">{s.note}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3 — EMISSIONS COUNTER */}
+      <section ref={emissRef} style={{ height: "270vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#f4f0e8]">
+          <div className="absolute inset-0 opacity-[0.06]">
+            <Image src="/images/EV car charging.png" alt="" fill className="object-cover" sizes="100vw" />
+          </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+            <p
+              style={{ opacity: eIn }}
+              className="text-[11px] font-semibold uppercase tracking-[0.46em] text-black/38"
+            >
+              CO2 tailpipe emissions
+            </p>
+            <div style={{ opacity: eIn, willChange: "opacity" }}>
+              <div className="mt-4 flex items-end justify-center gap-4">
+                <span className="tabular-nums text-[clamp(72px,16vw,216px)] font-semibold leading-none tracking-[-0.07em] text-black">
+                  {Math.round(eCounter)}
+                </span>
+                <div className="mb-3 text-left">
+                  <span className="text-[clamp(22px,3.5vw,52px)] font-semibold leading-none tracking-[-0.04em] text-black/35">
+                    g/km
+                  </span>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.32em] text-black/28">
+                    tailpipe CO2
+                  </p>
+                </div>
               </div>
-              <p className="mt-4 text-2xl font-semibold uppercase tracking-[-0.04em] text-black">
-                {selectedLens.metric}
-              </p>
-              <p className="mt-3 text-base leading-7 text-black/72">
-                {selectedLens.detail}
+            </div>
+            <div style={fadeUp(eDetailsIn, 24)} className="mt-12 w-full max-w-lg space-y-5">
+              {[
+                { label: "Average petrol car",       note: "156 g CO2/km",         pct: "100%", color: "bg-red-400"     },
+                { label: "EV with grid electricity", note: "53 g CO2/km lifecycle", pct: "34%",  color: "bg-amber-400"   },
+                { label: "EV with renewable energy", note: "~5 g CO2/km lifecycle", pct: "3%",   color: "bg-emerald-500" },
+              ].map((bar) => (
+                <div key={bar.label} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.28em] text-black/48">
+                    <span>{bar.label}</span>
+                    <span>{bar.note}</span>
+                  </div>
+                  <div className="h-2.5 overflow-hidden rounded-full bg-black/8">
+                    <div className={`h-full rounded-full ${bar.color}`} style={{ width: bar.pct }} />
+                  </div>
+                </div>
+              ))}
+              <p className="pt-3 text-sm leading-7 text-black/52">
+                With renewable charging, lifecycle emissions drop by up to{" "}
+                <strong className="font-semibold text-black">97%</strong> compared to petrol.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-6 pb-20 md:px-10 lg:px-12 lg:pb-28">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(300px,0.85fr)_minmax(0,1.15fr)] lg:gap-12">
-          <aside className="lg:sticky lg:top-8 lg:h-fit">
-            <div className="space-y-5 rounded-[2rem] border border-black/10 bg-white/85 p-5 shadow-[0_32px_100px_rgba(17,17,17,0.08)] backdrop-blur md:p-6">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-                  Scroll navigator
-                </p>
-                <div className="h-2 overflow-hidden rounded-full bg-black/8">
+      {/* 4 — PERFORMANCE BAR RACE */}
+      <section ref={perfRef} style={{ height: "310vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#111111]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+            <p
+              style={{ opacity: pEnter }}
+              className="text-[11px] font-semibold uppercase tracking-[0.46em] text-white/32"
+            >
+              0-60 mph acceleration
+            </p>
+            <h2
+              style={fadeUp(pEnter, 28)}
+              className="mt-4 text-center text-[clamp(44px,8.5vw,116px)] font-semibold uppercase leading-[0.86] tracking-[-0.055em] text-white"
+            >
+              Instant torque.
+              <span className="block text-[#2864f0]">No excuses.</span>
+            </h2>
+            <div className="mt-14 w-full max-w-2xl space-y-7">
+              <div style={{ opacity: sub(perfP, 0.02, 0.20) }}>
+                <div className="mb-2.5 flex items-center justify-between">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-white/32">
+                    Gas sedan (average)
+                  </p>
+                  <p className="text-base font-semibold text-red-400">7.4 seconds</p>
+                </div>
+                <div className="h-4 overflow-hidden rounded-full bg-white/8">
                   <div
-                    className="h-full rounded-full bg-black transition-all duration-500"
-                    style={{ width: progressWidth }}
+                    className="h-full rounded-full bg-red-400 transition-none"
+                    style={{ width: `${pGasBar}%`, willChange: "width" }}
                   />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                {storySections.map((section, index) => {
-                  const isActive = section.id === activeSectionId;
-
-                  return (
-                    <button
-                      key={section.id}
-                      type="button"
-                      onClick={() => scrollToSection(section.id)}
-                      className={`flex w-full items-center justify-between rounded-[1.3rem] border px-4 py-4 text-left transition-all duration-200 ${
-                        isActive
-                          ? "border-black bg-black text-white"
-                          : "border-black/10 bg-[#f7f4ef] text-black hover:border-black/25"
-                      }`}
-                    >
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-60">
-                          {section.step}
-                        </p>
-                        <p className="mt-2 text-sm font-medium leading-6">
-                          {section.title}
-                        </p>
-                      </div>
-                      <span className="text-lg font-semibold">
-                        0{index + 1}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-[#f7f4ef]">
-                <div className={`h-3 w-full ${activeSection.accent}`} />
-                <div className="relative aspect-[5/4] overflow-hidden">
-                  <Image
-                    key={activeSection.image}
-                    src={activeSection.image}
-                    alt={activeSection.alt}
-                    fill
-                    priority
-                    className="object-cover transition duration-500"
-                    sizes="(max-width: 1024px) 100vw, 36vw"
+              <div style={{ opacity: sub(perfP, 0.20, 0.40) }}>
+                <div className="mb-2.5 flex items-center justify-between">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-white/32">
+                    Electric vehicle
+                  </p>
+                  <p className="text-base font-semibold text-emerald-400">3.1 seconds</p>
+                </div>
+                <div className="h-4 overflow-hidden rounded-full bg-white/8">
+                  <div
+                    className="h-full rounded-full bg-emerald-400 transition-none"
+                    style={{ width: `${pEvBar}%`, willChange: "width" }}
                   />
                 </div>
-                <div className="space-y-3 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/45">
-                    Active visual
-                  </p>
-                  <p className="text-2xl font-semibold uppercase tracking-[-0.04em] text-black">
-                    {activeSection.statValue}
-                  </p>
-                  <p className="text-sm leading-6 text-black/70">
-                    {activeSection.statLabel}
-                  </p>
-                </div>
+              </div>
+              <div
+                style={{ opacity: pBadgeIn }}
+                className="flex items-center gap-4 rounded-[1.4rem] border border-emerald-500/18 bg-emerald-950/30 px-5 py-4"
+              >
+                <span className="text-3xl font-semibold tracking-[-0.05em] text-emerald-400">
+                  2.4x
+                </span>
+                <p className="text-sm text-white/50">faster off the line with zero mechanical delay</p>
               </div>
             </div>
-          </aside>
-
-          <div className="space-y-8">
-            {storySections.map((section, index) => {
-              const isActive = section.id === activeSectionId;
-
-              return (
-                <article
-                  key={section.id}
-                  id={`story-${section.id}`}
-                  data-story-section
-                  className={`motion-card rounded-[2rem] border p-7 shadow-[0_32px_100px_rgba(17,17,17,0.08)] transition-all duration-300 md:p-8 lg:min-h-[85vh] lg:p-10 ${
-                    isActive
-                      ? "border-black bg-white"
-                      : "border-black/8 bg-white/72"
-                  }`}
-                >
-                  <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_280px] lg:items-start">
-                    <div className="space-y-6">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span
-                          className={`inline-flex rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] ${section.accentSoft} ${section.accentText}`}
-                        >
-                          {section.step}
-                        </span>
-                        <span className="text-xs font-semibold uppercase tracking-[0.28em] text-black/40">
-                          Chapter 0{index + 1}
-                        </span>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h2 className="max-w-3xl text-3xl font-semibold uppercase leading-tight tracking-[-0.05em] text-black md:text-5xl">
-                          {section.title}
-                        </h2>
-                        <p className="max-w-2xl text-lg leading-8 text-black/72">
-                          {section.summary}
-                        </p>
-                      </div>
-
-                      <div className="grid gap-3 md:grid-cols-3">
-                        {section.bullets.map((bullet) => (
-                          <div
-                            key={bullet}
-                            className="rounded-[1.4rem] border border-black/10 bg-[#f7f4ef] p-4"
-                          >
-                            <p className="text-sm leading-6 text-black/72">
-                              {bullet}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="rounded-[1.6rem] border border-black/10 bg-black px-5 py-6 text-white">
-                        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/55">
-                          Why this matters
-                        </p>
-                        <p className="mt-3 max-w-2xl text-lg leading-8 text-white/84">
-                          {section.insight}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="rounded-[1.6rem] border border-black/10 bg-[#f7f4ef] p-5">
-                        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/45">
-                          Scene note
-                        </p>
-                        <p className="mt-4 text-4xl font-semibold uppercase tracking-[-0.07em] text-black">
-                          {section.statValue}
-                        </p>
-                        <p className="mt-3 text-sm leading-6 text-black/72">
-                          {section.statLabel}
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSelectedLensId(
-                            priorityLenses[index % priorityLenses.length].id,
-                          )
-                        }
-                        className={`flex w-full items-center justify-between rounded-[1.6rem] px-5 py-4 text-left text-sm font-semibold uppercase tracking-[0.18em] text-black transition-transform duration-200 hover:-translate-y-0.5 ${section.accentSoft}`}
-                      >
-                        Focus this lens
-                        <span className="text-black/55">Tap</span>
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            <p
+              style={fadeUp(pDetailsIn, 20)}
+              className="mt-10 max-w-xl text-center text-lg leading-8 text-white/50"
+            >
+              Electric motors deliver 100% of their torque from 0 RPM. No gear changes, no turbo
+              lag, no revving. Just silent, immediate power the instant you press the pedal.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="border-t border-black/10 px-6 py-16 md:px-10 lg:px-12 lg:py-20">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
-          <div className="space-y-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-              Comparison studio
+      {/* 5 — COST BAR CHART */}
+      <section ref={costRef} style={{ height: "330vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#f4f0e8]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+            <p
+              style={{ opacity: coEnter }}
+              className="text-[11px] font-semibold uppercase tracking-[0.46em] text-black/38"
+            >
+              5-year ownership cost
             </p>
-            <h2 className="max-w-2xl text-4xl font-semibold uppercase leading-tight tracking-[-0.05em] text-black md:text-5xl">
-              Compare three EV ownership profiles through the lens you care about most.
+            <h2
+              style={fadeUp(coEnter, 28)}
+              className="mt-4 text-center text-[clamp(34px,7vw,96px)] font-semibold uppercase leading-[0.86] tracking-[-0.055em] text-black"
+            >
+              Save $10,000.
+              <span className="block text-[#2864f0]">Over five years.</span>
             </h2>
-            <p className="max-w-xl text-lg leading-8 text-black/72">
-              This module turns the story into a hands-on planning tool. Swap metrics to see how different EV priorities change which profile feels strongest.
+            <div
+              style={{ opacity: sub(costP, 0.04, 0.22) }}
+              className="mt-14 flex items-end justify-center gap-16"
+            >
+              <div className="flex flex-col items-center gap-5">
+                <div
+                  className="relative flex w-32 items-start justify-center rounded-t-[1.4rem] bg-red-400 transition-none"
+                  style={{ height: `${coGasH}px`, minHeight: 4, willChange: "height" }}
+                >
+                  {coGasH > 90 && (
+                    <span className="mt-5 text-xl font-semibold text-white">$18,000</span>
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/38">
+                    Gas vehicle
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-red-500">Fuel + maintenance</p>
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-5">
+                <div
+                  className="relative flex w-32 items-start justify-center rounded-t-[1.4rem] bg-emerald-500 transition-none"
+                  style={{ height: `${coEvH}px`, minHeight: 4, willChange: "height" }}
+                >
+                  {coEvH > 55 && (
+                    <span className="mt-5 text-xl font-semibold text-white">$8,000</span>
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/38">
+                    Electric vehicle
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-emerald-600">Energy + maintenance</p>
+                </div>
+              </div>
+            </div>
+            <p
+              style={fadeUp(coTextIn, 20)}
+              className="mt-10 max-w-lg text-center text-lg leading-8 text-black/58"
+            >
+              Electricity beats gas at the pump. EVs skip oil changes, need fewer brake pads thanks
+              to regenerative braking, and have far fewer components that wear out.
             </p>
+            <div style={fadeUp(coTextIn, 16)} className="mt-8 grid grid-cols-3 gap-4 text-center">
+              {[
+                { label: "Annual fuel saving", value: "~$2,500"  },
+                { label: "Maintenance saving", value: "~$500/yr" },
+                { label: "5-year total",        value: "$10,000+" },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-[1.4rem] border border-black/10 bg-white/80 px-4 py-4"
+                >
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-black/38">
+                    {s.label}
+                  </p>
+                  <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-black">{s.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="rounded-[1.8rem] border border-black/10 bg-white/80 p-5 shadow-[0_24px_80px_rgba(17,17,17,0.08)] backdrop-blur">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/45">
-                Active metric
+      {/* 6 — CHARGING */}
+      <section ref={chargRef} style={{ height: "270vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden">
+          <div className="absolute inset-0">
+            <Image
+              src="/images/EV car charging.png"
+              alt="Electric vehicle charging"
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/52 to-black/82" />
+          </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+            <p
+              style={{ opacity: chEnter }}
+              className="text-[11px] font-semibold uppercase tracking-[0.46em] text-white/48"
+            >
+              Charging
+            </p>
+            <h2
+              style={fadeUp(chEnter, 32)}
+              className="mt-5 max-w-4xl text-[clamp(38px,8vw,112px)] font-semibold uppercase leading-[0.85] tracking-[-0.055em] text-white"
+            >
+              Wake up full. Every morning.
+            </h2>
+            <div
+              style={{ opacity: sub(chargP, 0.10, 0.32) }}
+              className="mt-12 w-full max-w-xs rounded-[2rem] border border-white/14 bg-white/8 p-6 backdrop-blur-lg"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/48">
+                  Battery charging overnight
+                </p>
+                <p className="text-sm font-semibold text-emerald-400">{Math.round(chFill)}%</p>
+              </div>
+              <div className="mt-4 h-4 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-emerald-400 transition-none"
+                  style={{ width: `${chFill}%`, willChange: "width" }}
+                />
+              </div>
+              <p className="mt-3 text-[10px] text-white/32">
+                Plugged in at home. No gas station required.
               </p>
-              <div className="mt-4 flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-2xl ${selectedMetric.accent}`} />
-                <div>
-                  <p className="text-2xl font-semibold uppercase tracking-[-0.04em] text-black">
-                    {selectedMetric.label}
-                  </p>
-                  <p className="text-sm leading-6 text-black/70">
-                    {selectedMetric.description}
-                  </p>
-                </div>
+            </div>
+            <div
+              style={fadeUp(chTextIn, 22)}
+              className="mt-10 grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2"
+            >
+              <div className="rounded-[1.5rem] border border-red-500/14 bg-red-950/22 p-5 text-left backdrop-blur-md">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-red-400/60">
+                  Gas station
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-white/48">
+                  <li>Detour from your route</li>
+                  <li>Queue, pay, pump, leave</li>
+                  <li>Prices change every week</li>
+                  <li>Fumes, noise, time lost</li>
+                </ul>
+              </div>
+              <div className="rounded-[1.5rem] border border-emerald-500/18 bg-emerald-950/22 p-5 text-left backdrop-blur-md">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-emerald-400">
+                  EV charging
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-white/65">
+                  <li>Plug in at home while you sleep</li>
+                  <li>Charge at work, often for free</li>
+                  <li>10-min fast charge adds 100+ miles</li>
+                  <li>Full battery every single morning</li>
+                </ul>
               </div>
             </div>
           </div>
-
-          <div className="space-y-5 rounded-[2rem] border border-black/10 bg-white/85 p-6 shadow-[0_32px_100px_rgba(17,17,17,0.08)] backdrop-blur">
-            <div className="flex flex-wrap gap-3">
-              {comparisonMetrics.map((metric) => {
-                const isSelected = metric.id === selectedMetricId;
-
-                return (
-                  <button
-                    key={metric.id}
-                    type="button"
-                    onClick={() => setSelectedMetricId(metric.id)}
-                    className={`rounded-full border px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] transition-all duration-200 ${
-                      isSelected
-                        ? "border-black bg-black text-white"
-                        : "border-black/10 bg-[#f7f4ef] text-black hover:-translate-y-0.5 hover:border-black/30"
-                    }`}
-                  >
-                    {metric.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              {rankedProfiles.map((profile, index) => {
-                const value = profile.values[selectedMetricId];
-                const width =
-                  metricDomain.max === metricDomain.min
-                    ? 100
-                    : ((value - metricDomain.min) / (metricDomain.max - metricDomain.min)) * 100;
-
-                return (
-                  <div
-                    key={profile.id}
-                    className={`motion-card rounded-[1.75rem] border p-5 transition-all duration-300 ${
-                      index === 0
-                        ? "border-black bg-black text-white"
-                        : "border-black/10 bg-[#f7f4ef] text-black"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] opacity-60">
-                          {profile.audience}
-                        </p>
-                        <h3 className="mt-2 text-2xl font-semibold uppercase tracking-[-0.04em]">
-                          {profile.name}
-                        </h3>
-                      </div>
-                      <span className="rounded-full border border-current/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em]">
-                        {index === 0 ? "Lead" : `0${index + 1}`}
-                      </span>
-                    </div>
-
-                    <div className="mt-6 space-y-3">
-                      <div className="flex items-end justify-between gap-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.28em] opacity-60">
-                          {selectedMetric.label}
-                        </p>
-                        <p className="text-4xl font-semibold uppercase tracking-[-0.07em]">
-                          {selectedMetricId === "cost" ? "$" : ""}
-                          {value}
-                          {selectedMetricId === "range" ? " mi" : ""}
-                          {selectedMetricId === "charge" ? " min" : ""}
-                          {selectedMetricId === "comfort" ? "/10" : ""}
-                        </p>
-                      </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-current/10">
-                        <div
-                          className={`h-full rounded-full ${index === 0 ? "bg-white" : selectedMetric.accent}`}
-                          style={{ width: `${Math.max(width, 18)}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <p className="mt-5 text-sm leading-6 opacity-80">
-                      {profile.summary}
-                    </p>
-
-                    <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
-                      <div className="rounded-[1.2rem] border border-current/10 p-3">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-55">
-                          Range
-                        </p>
-                        <p className="mt-2 font-semibold">{profile.values.range} mi</p>
-                      </div>
-                      <div className="rounded-[1.2rem] border border-current/10 p-3">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-55">
-                          Charge
-                        </p>
-                        <p className="mt-2 font-semibold">{profile.values.charge} min</p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection(profile.sectionId)}
-                      className={`mt-6 w-full rounded-full border px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] transition-transform duration-200 hover:-translate-y-0.5 ${
-                        index === 0
-                          ? "border-white/20 bg-white text-black"
-                          : "border-black/10 bg-white text-black"
-                      }`}
-                    >
-                      Open relevant chapter
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <p className="text-xs leading-6 uppercase tracking-[0.18em] text-black/45">
-              Illustrative comparison for storytelling purposes — meant to explain trade-offs, not represent one specific production vehicle.
-            </p>
-          </div>
         </div>
       </section>
 
-      <section className="border-t border-black/10 px-6 py-16 md:px-10 lg:px-12 lg:py-20">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
-          <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-              Takeaway
+      {/* 7 — INTERIOR */}
+      <section ref={interiorRef} style={{ height: "270vh" }} className="relative">
+        <div className="sticky top-0 h-screen overflow-hidden bg-black">
+          <div
+            className="absolute inset-0"
+            style={{ transform: `scale(${iImgScale})`, willChange: "transform" }}
+          >
+            <Image
+              src="/images/EV car interior.png"
+              alt="Modern electric vehicle interior"
+              fill
+              className="object-cover opacity-70"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/86 via-black/44 to-black/10" />
+          </div>
+          <div className="absolute inset-0 flex flex-col justify-center px-10 md:px-16 lg:px-24">
+            <p
+              style={{ opacity: iTextIn }}
+              className="text-[11px] font-semibold uppercase tracking-[0.46em] text-white/42"
+            >
+              The cabin redesigned
             </p>
-            <h2 className="max-w-2xl text-4xl font-semibold uppercase leading-tight tracking-[-0.05em] text-black md:text-5xl">
-              The best EV experience is not just efficient. It feels composed.
+            <h2
+              style={fadeUp(iTextIn, 28)}
+              className="mt-5 max-w-2xl text-[clamp(38px,7.5vw,100px)] font-semibold uppercase leading-[0.86] tracking-[-0.055em] text-white"
+            >
+              Quieter. Wider. Smarter.
             </h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {priorityLenses.map((lens) => {
-              const isSelected = lens.id === selectedLensId;
-
-              return (
-                <button
-                  key={lens.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedLensId(lens.id);
-                    scrollToSection(lens.sectionId);
-                  }}
-                  className={`rounded-[1.75rem] border p-5 text-left transition-all duration-200 ${
-                    isSelected
-                      ? "border-black bg-black text-white"
-                      : "border-black/10 bg-white/80 text-black hover:border-black/30"
-                  }`}
+            <p
+              style={fadeUp(iTextIn, 20)}
+              className="mt-6 max-w-lg text-xl leading-9 text-white/62"
+            >
+              No engine under the hood means total redesign freedom. EV cabins gain flat floors,
+              panoramic glass roofs, and whisper-quiet acoustics.
+            </p>
+            <div
+              style={fadeUp(iBenefits, 18)}
+              className="mt-10 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3"
+            >
+              {[
+                { stat: "10 dB", label: "Quieter cabin", note: "No engine roar at highway speed"  },
+                { stat: "Flat",  label: "Open floor",     note: "No transmission tunnel below you" },
+                { stat: "OTA",   label: "Live updates",   note: "Car improves while you sleep"     },
+              ].map((item) => (
+                <div
+                  key={item.stat}
+                  className="rounded-[1.5rem] border border-white/10 bg-white/8 p-5 backdrop-blur-sm"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] opacity-60">
-                    {lens.label}
+                  <p className="text-[clamp(20px,2.4vw,28px)] font-semibold uppercase tracking-[-0.04em] text-white">
+                    {item.stat}
                   </p>
-                  <p className="mt-3 text-2xl font-semibold uppercase tracking-[-0.04em]">
-                    {lens.metric}
+                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/42">
+                    {item.label}
                   </p>
-                  <p className="mt-3 text-sm leading-6 opacity-80">
-                    {lens.detail}
-                  </p>
-                </button>
-              );
-            })}
+                  <p className="mt-2 text-sm text-white/38">{item.note}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
-    </main>
+
+      {/* 8 — VERDICT */}
+      <section
+        id="close"
+        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 py-28 text-center"
+      >
+        <div className="absolute inset-0 opacity-[0.18]">
+          <Image src="/images/EV car battery.png" alt="EV battery" fill className="object-cover" sizes="100vw" />
+          <div className="absolute inset-0 bg-black/65" />
+        </div>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-[5%]  top-[17%]    h-20 w-20 rounded-full bg-[#e6483d] opacity-75" />
+          <div className="absolute right-[9%] bottom-[18%] h-24 w-24 bg-[#f5c518] opacity-75" />
+          <div className="absolute right-[4%] top-[11%]    h-16 w-16 rounded-full bg-[#2864f0] opacity-75" />
+          <div className="absolute left-[2%]  bottom-[32%] h-14 w-14 rounded-full border-[6px] border-white/12" />
+        </div>
+        <div className="relative z-10 max-w-5xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.46em] text-white/30">
+            The verdict
+          </p>
+          <h2 className="mt-6 text-[clamp(46px,9vw,128px)] font-semibold uppercase leading-[0.84] tracking-[-0.06em] text-white">
+            Electric is not a compromise.
+            <span className="block text-[#2864f0]">It is an upgrade.</span>
+          </h2>
+          <p className="mx-auto mt-8 max-w-2xl text-xl leading-9 text-white/58">
+            Faster acceleration. Zero tailpipe emissions. 78% cheaper to fuel. Fewer repairs. A
+            cabin redesigned from the ground up. Electric is better in every way that matters.
+          </p>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+            <button className="rounded-full bg-white px-8 py-4 text-sm font-semibold uppercase tracking-[0.24em] text-black transition-transform duration-200 hover:-translate-y-0.5">
+              Explore EVs
+            </button>
+            <button className="rounded-full border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-[0.24em] text-white/68 transition-all duration-200 hover:border-white/30 hover:text-white">
+              Read the research
+            </button>
+          </div>
+          <div className="mt-20 grid grid-cols-2 gap-4 md:grid-cols-4">
+            {[
+              { value: "0g",   sub: "Tailpipe CO2",    accent: "text-emerald-400" },
+              { value: "78%",  sub: "Cheaper to fuel", accent: "text-emerald-400" },
+              { value: "2.4x", sub: "Faster 0-60",     accent: "text-[#2864f0]"  },
+              { value: "$10k", sub: "5-yr savings",     accent: "text-emerald-400" },
+            ].map((item) => (
+              <div
+                key={item.value}
+                className="rounded-[1.75rem] border border-white/8 bg-white/5 p-5 text-center"
+              >
+                <p className={`text-4xl font-semibold uppercase tracking-[-0.05em] ${item.accent}`}>
+                  {item.value}
+                </p>
+                <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/30">
+                  {item.sub}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-16 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/18">
+            EV / Future · Scrollytelling · Guna Banka
+          </p>
+        </div>
+      </section>
+    </>
   );
 }
