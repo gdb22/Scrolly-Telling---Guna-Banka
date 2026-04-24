@@ -198,7 +198,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 resolvedSrc: withBasePath("/images/EV cars.png"),
@@ -219,6 +219,31 @@ export default function Home() {
                 resolvedSrc: withBasePath("/images/EV car interior.png"),
                 alt: "Modern electric vehicle interior",
                 label: "Interior comfort",
+              },
+              {
+                resolvedSrc: withBasePath("/images/Tesla.png"),
+                alt: "Tesla electric vehicle exterior",
+                label: "Tesla exterior",
+              },
+              {
+                resolvedSrc: withBasePath("/images/Tesla interior.png"),
+                alt: "Tesla electric vehicle interior",
+                label: "Tesla interior",
+              },
+              {
+                resolvedSrc: withBasePath("/images/Rivian.png"),
+                alt: "Rivian electric vehicle exterior",
+                label: "Rivian exterior",
+              },
+              {
+                resolvedSrc: withBasePath("/images/Rivian interior.png"),
+                alt: "Rivian electric vehicle interior",
+                label: "Rivian interior",
+              },
+              {
+                resolvedSrc: withBasePath("/images/Types of EV cars.png"),
+                alt: "Different types of electric vehicles",
+                label: "Types of EV cars",
               },
             ].map((item) => (
               <figure
