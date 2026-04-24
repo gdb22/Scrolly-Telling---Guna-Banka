@@ -180,6 +180,69 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Image showcase — clean Swiss grid */}
+      <section className="relative bg-[#f4f0e8] px-6 py-24 md:px-10">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 flex items-end justify-between gap-6">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.38em] text-black/40">
+                Visual story
+              </p>
+              <h2 className="mt-3 text-[clamp(28px,4.2vw,52px)] font-semibold uppercase leading-[0.9] tracking-[-0.045em] text-black">
+                The EV experience, frame by frame.
+              </h2>
+            </div>
+            <p className="hidden max-w-sm text-sm leading-7 text-black/55 md:block">
+              A calm, editorial preview of the same EV journey: design, charging, battery systems,
+              and everyday driving comfort.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {[
+              {
+                src: "/images/EV cars.png",
+                alt: "A lineup of electric vehicles",
+                label: "EV lineup",
+              },
+              {
+                src: "/images/EV car charging.png",
+                alt: "Electric vehicle plugged into a charger",
+                label: "Home and fast charging",
+              },
+              {
+                src: "/images/EV car battery.png",
+                alt: "Electric vehicle battery technology",
+                label: "Battery systems",
+              },
+              {
+                src: "/images/EV car interior.png",
+                alt: "Modern electric vehicle interior",
+                label: "Interior comfort",
+              },
+            ].map((item) => (
+              <figure
+                key={item.src}
+                className="group overflow-hidden rounded-[1.4rem] border border-black/10 bg-white"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                <figcaption className="border-t border-black/10 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-black/55">
+                  {item.label}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 2 — GAS VS EV */}
       <section ref={compareRef} style={{ height: "340vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden bg-[#0a0a0a]">
