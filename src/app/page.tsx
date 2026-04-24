@@ -138,19 +138,14 @@ export default function Home() {
       {/* 1 — HERO */}
       <section ref={heroRef} style={{ height: "300vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden bg-black">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0e1a35] via-[#101010] to-[#0b0b0b]" />
           <div
-            className="absolute inset-0"
+            className="pointer-events-none absolute inset-0"
             style={{ transform: `scale(${hImgScale})`, willChange: "transform" }}
           >
-            <Image
-              src={withBasePath("/images/EV cars.png")}
-              alt="A lineup of electric vehicles"
-              fill
-              priority
-              className="object-cover"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
+            <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-[#2864f0]/35 blur-3xl" />
+            <div className="absolute right-0 top-1/3 h-80 w-80 rounded-full bg-[#39d98a]/25 blur-3xl" />
+            <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-[#f5c518]/20 blur-3xl" />
           </div>
           <div
             className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
@@ -206,32 +201,28 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[
               {
-                src: "/images/EV cars.png",
                 resolvedSrc: withBasePath("/images/EV cars.png"),
                 alt: "A lineup of electric vehicles",
                 label: "EV lineup",
               },
               {
-                src: "/images/EV car charging.png",
                 resolvedSrc: withBasePath("/images/EV car charging.png"),
                 alt: "Electric vehicle plugged into a charger",
                 label: "Home and fast charging",
               },
               {
-                src: "/images/EV car battery.png",
                 resolvedSrc: withBasePath("/images/EV car battery.png"),
                 alt: "Electric vehicle battery technology",
                 label: "Battery systems",
               },
               {
-                src: "/images/EV car interior.png",
                 resolvedSrc: withBasePath("/images/EV car interior.png"),
                 alt: "Modern electric vehicle interior",
                 label: "Interior comfort",
               },
             ].map((item) => (
               <figure
-                key={item.src}
+                key={item.resolvedSrc}
                 className="group overflow-hidden rounded-[1.4rem] border border-black/10 bg-white"
               >
                 <div className="relative aspect-[16/10] overflow-hidden">
@@ -333,9 +324,6 @@ export default function Home() {
       {/* 3 — EMISSIONS COUNTER */}
       <section ref={emissRef} style={{ height: "270vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden bg-[#f4f0e8]">
-          <div className="absolute inset-0 opacity-[0.06]">
-            <Image src={withBasePath("/images/EV car charging.png")} alt="" fill className="object-cover" sizes="100vw" />
-          </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <p
               style={{ opacity: eIn }}
@@ -535,16 +523,9 @@ export default function Home() {
       {/* 6 — CHARGING */}
       <section ref={chargRef} style={{ height: "270vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden">
-          <div className="absolute inset-0">
-            <Image
-              src={withBasePath("/images/EV car charging.png")}
-              alt="Electric vehicle charging"
-              fill
-              className="object-cover"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/52 to-black/82" />
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0d1220] via-[#121212] to-[#070707]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(40,100,240,0.25),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(57,217,138,0.18),transparent_40%)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/72" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <p
               style={{ opacity: chEnter }}
@@ -616,13 +597,7 @@ export default function Home() {
             className="absolute inset-0"
             style={{ transform: `scale(${iImgScale})`, willChange: "transform" }}
           >
-            <Image
-              src={withBasePath("/images/EV car interior.png")}
-              alt="Modern electric vehicle interior"
-              fill
-              className="object-cover opacity-70"
-              sizes="100vw"
-            />
+            <div className="absolute inset-0 bg-[linear-gradient(120deg,#0b0b0b_10%,#141b2f_45%,#1f1f1f_100%)]" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/86 via-black/44 to-black/10" />
           </div>
           <div className="absolute inset-0 flex flex-col justify-center px-10 md:px-16 lg:px-24">
@@ -677,9 +652,8 @@ export default function Home() {
         id="close"
         className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 py-28 text-center"
       >
-        <div className="absolute inset-0 opacity-[0.18]">
-          <Image src={withBasePath("/images/EV car battery.png")} alt="EV battery" fill className="object-cover" sizes="100vw" />
-          <div className="absolute inset-0 bg-black/65" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-[#101629] to-[#000000]">
+          <div className="absolute inset-0 bg-black/58" />
         </div>
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute left-[5%]  top-[17%]    h-20 w-20 rounded-full bg-[#e6483d] opacity-75" />
