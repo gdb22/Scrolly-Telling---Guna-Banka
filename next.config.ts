@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  env: {
+    NEXT_PUBLIC_BASE_PATH: shouldUseBasePath ? `/${repository}` : "",
+  },
   basePath: shouldUseBasePath ? `/${repository}` : "",
   assetPrefix: shouldUseBasePath ? `/${repository}/` : undefined,
 };

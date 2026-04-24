@@ -31,6 +31,11 @@ function fadeUp(opacity: number, yStart = 32): React.CSSProperties {
   };
 }
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+function withBasePath(path: string) {
+  return `${basePath}${path}`;
+}
+
 export default function Home() {
   const heroRef     = useRef<HTMLElement>(null);
   const compareRef  = useRef<HTMLElement>(null);
@@ -138,7 +143,7 @@ export default function Home() {
             style={{ transform: `scale(${hImgScale})`, willChange: "transform" }}
           >
             <Image
-              src="/images/EV cars.png"
+              src={withBasePath("/images/EV cars.png")}
               alt="A lineup of electric vehicles"
               fill
               priority
@@ -202,21 +207,25 @@ export default function Home() {
             {[
               {
                 src: "/images/EV cars.png",
+                resolvedSrc: withBasePath("/images/EV cars.png"),
                 alt: "A lineup of electric vehicles",
                 label: "EV lineup",
               },
               {
                 src: "/images/EV car charging.png",
+                resolvedSrc: withBasePath("/images/EV car charging.png"),
                 alt: "Electric vehicle plugged into a charger",
                 label: "Home and fast charging",
               },
               {
                 src: "/images/EV car battery.png",
+                resolvedSrc: withBasePath("/images/EV car battery.png"),
                 alt: "Electric vehicle battery technology",
                 label: "Battery systems",
               },
               {
                 src: "/images/EV car interior.png",
+                resolvedSrc: withBasePath("/images/EV car interior.png"),
                 alt: "Modern electric vehicle interior",
                 label: "Interior comfort",
               },
@@ -227,7 +236,7 @@ export default function Home() {
               >
                 <div className="relative aspect-[16/10] overflow-hidden">
                   <Image
-                    src={item.src}
+                    src={item.resolvedSrc}
                     alt={item.alt}
                     fill
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
@@ -325,7 +334,7 @@ export default function Home() {
       <section ref={emissRef} style={{ height: "270vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden bg-[#f4f0e8]">
           <div className="absolute inset-0 opacity-[0.06]">
-            <Image src="/images/EV car charging.png" alt="" fill className="object-cover" sizes="100vw" />
+            <Image src={withBasePath("/images/EV car charging.png")} alt="" fill className="object-cover" sizes="100vw" />
           </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <p
@@ -528,7 +537,7 @@ export default function Home() {
         <div className="sticky top-0 h-screen overflow-hidden">
           <div className="absolute inset-0">
             <Image
-              src="/images/EV car charging.png"
+              src={withBasePath("/images/EV car charging.png")}
               alt="Electric vehicle charging"
               fill
               className="object-cover"
@@ -608,7 +617,7 @@ export default function Home() {
             style={{ transform: `scale(${iImgScale})`, willChange: "transform" }}
           >
             <Image
-              src="/images/EV car interior.png"
+              src={withBasePath("/images/EV car interior.png")}
               alt="Modern electric vehicle interior"
               fill
               className="object-cover opacity-70"
@@ -669,7 +678,7 @@ export default function Home() {
         className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 py-28 text-center"
       >
         <div className="absolute inset-0 opacity-[0.18]">
-          <Image src="/images/EV car battery.png" alt="EV battery" fill className="object-cover" sizes="100vw" />
+          <Image src={withBasePath("/images/EV car battery.png")} alt="EV battery" fill className="object-cover" sizes="100vw" />
           <div className="absolute inset-0 bg-black/65" />
         </div>
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
