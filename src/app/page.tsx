@@ -36,7 +36,7 @@ function withBasePath(path: string) {
   return `${basePath}${path}`;
 }
 
-const EV_EXPLORER_URL = "https://www.energy.gov/eere/electricvehicles/electric-vehicle-basics";
+const EV_EXPLORER_URL = "https://www.evgo.com/ev-drivers/types-of-evs/";
 const EV_RESEARCH_URL = "https://www.iea.org/reports/global-ev-outlook-2024";
 
 export default function Home() {
