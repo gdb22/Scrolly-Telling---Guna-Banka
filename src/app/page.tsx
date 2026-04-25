@@ -36,6 +36,9 @@ function withBasePath(path: string) {
   return `${basePath}${path}`;
 }
 
+const EV_EXPLORER_URL = "https://www.tesla.com/";
+const EV_RESEARCH_URL = "https://www.iea.org/reports/global-ev-outlook-2024";
+
 export default function Home() {
   const heroRef     = useRef<HTMLElement>(null);
   const compareRef  = useRef<HTMLElement>(null);
@@ -699,12 +702,22 @@ export default function Home() {
             cabin redesigned from the ground up. Electric is better in every way that matters.
           </p>
           <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-            <button className="rounded-full bg-white px-8 py-4 text-sm font-semibold uppercase tracking-[0.24em] text-black transition-transform duration-200 hover:-translate-y-0.5">
+            <a
+              href={EV_EXPLORER_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-white px-8 py-4 text-sm font-semibold uppercase tracking-[0.24em] text-black transition-transform duration-200 hover:-translate-y-0.5"
+            >
               Explore EVs
-            </button>
-            <button className="rounded-full border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-[0.24em] text-white/68 transition-all duration-200 hover:border-white/30 hover:text-white">
+            </a>
+            <a
+              href={EV_RESEARCH_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-[0.24em] text-white/68 transition-all duration-200 hover:border-white/30 hover:text-white"
+            >
               Read the research
-            </button>
+            </a>
           </div>
           <div className="mt-20 grid grid-cols-2 gap-4 md:grid-cols-4">
             {[
