@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f0e8;
-  --foreground: #111111;
+  --background: #f7f8ff;
+  --foreground: #0f1222;
   --surface: rgba(255, 255, 255, 0.8);
-  --line: rgba(17, 17, 17, 0.12);
+  --line: rgba(52, 66, 144, 0.18);
 }
 
 @theme inline {
@@ -27,14 +27,15 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   background-image:
-    linear-gradient(to right, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 40%);
+    linear-gradient(to right, rgba(47, 52, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 0, 110, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(255, 209, 102, 0.35), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(76, 201, 240, 0.28), transparent 38%);
   background-size: 40px 40px, 40px 40px, auto;
 }
 
 body::selection {
-  background: #2864f0;
+  background: #ff006e;
   color: #ffffff;
 }
 

@@ -141,7 +141,15 @@ export default function Home() {
       {/* 1 — HERO */}
       <section ref={heroRef} style={{ height: "300vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden bg-black">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0e1a35] via-[#101010] to-[#0b0b0b]" />
+          <Image
+            src={withBasePath("/images/EV cars.png")}
+            alt="A lineup of electric vehicles"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#2f34ff]/70 via-[#ff2d95]/35 to-[#0b0b0b]/90" />
           <div
             className="pointer-events-none absolute inset-0"
             style={{ transform: `scale(${hImgScale})`, willChange: "transform" }}
@@ -183,97 +191,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Image showcase — clean Swiss grid */}
-      <section className="relative bg-[#f4f0e8] px-6 py-24 md:px-10">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 flex items-end justify-between gap-6">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.38em] text-black/40">
-                Visual story
-              </p>
-              <h2 className="mt-3 text-[clamp(28px,4.2vw,52px)] font-semibold uppercase leading-[0.9] tracking-[-0.045em] text-black">
-                The EV experience, frame by frame.
-              </h2>
-            </div>
-            <p className="hidden max-w-sm text-sm leading-7 text-black/55 md:block">
-              A calm, editorial preview of the same EV journey: design, charging, battery systems,
-              and everyday driving comfort.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                resolvedSrc: withBasePath("/images/EV cars.png"),
-                alt: "A lineup of electric vehicles",
-                label: "EV lineup",
-              },
-              {
-                resolvedSrc: withBasePath("/images/EV car charging.png"),
-                alt: "Electric vehicle plugged into a charger",
-                label: "Home and fast charging",
-              },
-              {
-                resolvedSrc: withBasePath("/images/EV car battery.png"),
-                alt: "Electric vehicle battery technology",
-                label: "Battery systems",
-              },
-              {
-                resolvedSrc: withBasePath("/images/EV car interior.png"),
-                alt: "Modern electric vehicle interior",
-                label: "Interior comfort",
-              },
-              {
-                resolvedSrc: withBasePath("/images/Tesla.png"),
-                alt: "Tesla electric vehicle exterior",
-                label: "Tesla exterior",
-              },
-              {
-                resolvedSrc: withBasePath("/images/Tesla interior.png"),
-                alt: "Tesla electric vehicle interior",
-                label: "Tesla interior",
-              },
-              {
-                resolvedSrc: withBasePath("/images/Rivian.png"),
-                alt: "Rivian electric vehicle exterior",
-                label: "Rivian exterior",
-              },
-              {
-                resolvedSrc: withBasePath("/images/Rivian interior.png"),
-                alt: "Rivian electric vehicle interior",
-                label: "Rivian interior",
-              },
-              {
-                resolvedSrc: withBasePath("/images/Types of EV cars.png"),
-                alt: "Different types of electric vehicles",
-                label: "Types of EV cars",
-              },
-            ].map((item) => (
-              <figure
-                key={item.resolvedSrc}
-                className="group overflow-hidden rounded-[1.4rem] border border-black/10 bg-white"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden">
-                  <Image
-                    src={item.resolvedSrc}
-                    alt={item.alt}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                </div>
-                <figcaption className="border-t border-black/10 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-black/55">
-                  {item.label}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* 2 — GAS VS EV */}
       <section ref={compareRef} style={{ height: "340vh" }} className="relative">
-        <div className="sticky top-0 h-screen overflow-hidden bg-[#0a0a0a]">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#120f1f]">
+          <Image
+            src={withBasePath("/images/Types of EV cars.png")}
+            alt="Different types of electric vehicles"
+            fill
+            className="object-cover opacity-28"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#240046]/80 via-[#120f1f]/70 to-[#003566]/70" />
+          <div className="absolute right-6 top-24 hidden h-40 w-60 overflow-hidden rounded-2xl border border-white/20 md:block">
+            <Image
+              src={withBasePath("/images/Rivian interior.png")}
+              alt="Rivian interior"
+              fill
+              className="object-cover"
+              sizes="240px"
+            />
+          </div>
           <div
             className="absolute inset-0 flex flex-col items-center justify-center px-6"
             style={{
@@ -351,7 +288,15 @@ export default function Home() {
 
       {/* 3 — EMISSIONS COUNTER */}
       <section ref={emissRef} style={{ height: "270vh" }} className="relative">
-        <div className="sticky top-0 h-screen overflow-hidden bg-[#f4f0e8]">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#fff4cf]">
+          <Image
+            src={withBasePath("/images/EV car battery.png")}
+            alt="Electric vehicle battery technology"
+            fill
+            className="object-cover opacity-22"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#ffd166]/45 via-[#ff9f1c]/25 to-[#fff4cf]/80" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <p
               style={{ opacity: eIn }}
@@ -402,6 +347,14 @@ export default function Home() {
       {/* 4 — PERFORMANCE BAR RACE */}
       <section ref={perfRef} style={{ height: "310vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden bg-[#111111]">
+          <Image
+            src={withBasePath("/images/Tesla.png")}
+            alt="Tesla electric vehicle exterior"
+            fill
+            className="object-cover opacity-26"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#2f34ff]/45 via-[#111111]/78 to-[#111111]/92" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
             <p
               style={{ opacity: pEnter }}
@@ -468,7 +421,15 @@ export default function Home() {
 
       {/* 5 — COST BAR CHART */}
       <section ref={costRef} style={{ height: "330vh" }} className="relative">
-        <div className="sticky top-0 h-screen overflow-hidden bg-[#f4f0e8]">
+        <div className="sticky top-0 h-screen overflow-hidden bg-[#ecf8ff]">
+          <Image
+            src={withBasePath("/images/Rivian.png")}
+            alt="Rivian electric vehicle exterior"
+            fill
+            className="object-cover opacity-22"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#ecf8ff]/86 via-[#4cc9f0]/16 to-[#f8fbff]/62" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
             <p
               style={{ opacity: coEnter }}
@@ -551,9 +512,14 @@ export default function Home() {
       {/* 6 — CHARGING */}
       <section ref={chargRef} style={{ height: "270vh" }} className="relative">
         <div className="sticky top-0 h-screen overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0d1220] via-[#121212] to-[#070707]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(40,100,240,0.25),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(57,217,138,0.18),transparent_40%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/72" />
+          <Image
+            src={withBasePath("/images/EV car charging.png")}
+            alt="Electric vehicle plugged into a charger"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#00bbf9]/40 via-black/44 to-[#030712]/84" />
           <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <p
               style={{ opacity: chEnter }}
@@ -625,7 +591,13 @@ export default function Home() {
             className="absolute inset-0"
             style={{ transform: `scale(${iImgScale})`, willChange: "transform" }}
           >
-            <div className="absolute inset-0 bg-[linear-gradient(120deg,#0b0b0b_10%,#141b2f_45%,#1f1f1f_100%)]" />
+            <Image
+              src={withBasePath("/images/EV car interior.png")}
+              alt="Modern electric vehicle interior"
+              fill
+              className="object-cover opacity-72"
+              sizes="100vw"
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-black/86 via-black/44 to-black/10" />
           </div>
           <div className="absolute inset-0 flex flex-col justify-center px-10 md:px-16 lg:px-24">
@@ -680,7 +652,15 @@ export default function Home() {
         id="close"
         className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 py-28 text-center"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-[#101629] to-[#000000]">
+        <div className="absolute inset-0">
+          <Image
+            src={withBasePath("/images/Tesla interior.png")}
+            alt="Tesla interior"
+            fill
+            className="object-cover opacity-30"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#ff006e]/24 via-[#101629]/84 to-[#000000]" />
           <div className="absolute inset-0 bg-black/58" />
         </div>
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
