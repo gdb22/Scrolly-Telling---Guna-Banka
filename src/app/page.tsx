@@ -202,15 +202,7 @@ export default function Home() {
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#240046]/80 via-[#120f1f]/70 to-[#003566]/70" />
-          <div className="absolute right-6 top-24 hidden h-40 w-60 overflow-hidden rounded-2xl border border-white/20 md:block">
-            <Image
-              src={withBasePath("/images/Rivian interior.png")}
-              alt="Rivian interior"
-              fill
-              className="object-cover"
-              sizes="240px"
-            />
-          </div>
+
           <div
             className="absolute inset-0 flex flex-col items-center justify-center px-6"
             style={{
